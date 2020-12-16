@@ -1,0 +1,127 @@
+﻿@model IEnumerable<SisWebViaje.Models.ControlViaje>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ListadoViaje</title>
+</head>
+<body>
+    @{
+        if (@TempData["mensaje"] != null)
+        {
+            <div class="alert alert-success" role="alert">
+                @TempData["mensaje"]
+            </div>
+        }
+    }
+
+    <table class="table table-hover text-center" id="DataListar">
+        <thead style="background: #04429C; color:#ffffff;">
+            <tr>
+                <th class="text-center">
+                    Nro Viaje
+                </th>
+                <th class="text-center">
+                   Fecha
+                </th>
+                <th class="text-center">
+                    Hora
+                </th>
+                <th class="text-center">
+                    Costo
+                </th>
+                <th class="text-center">
+                    Placa
+                </th>
+                <th class="text-center">
+                    Chofer
+                </th>
+                <th class="text-center">
+                    Ruta
+                </th>
+                <th class="text-center">
+                    Accion
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VIANRO)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VIAFCH)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VIAHRS)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.COSVIA)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BUSPLA)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CHONOM)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RUTNOM)
+                </td>
+                <td>
+                    @{
+                        DateTime FechaActual = DateTime.Now.Date;
+                        DateTime FechaViaje = Convert.ToDateTime(item.VIAFCH).Date;
+                        if (FechaViaje < FechaActual)
+                        {
+
+                            <a href="javascript:void(0)" class="btn btn-info" disabled=""><span style="visibility:hidden;">Editar</span></a>
+                            <a href="javascript:void(0)" class="btn btn-danger" disabled=""><span style="visibility:hidden;">Eliminar</span></a>
+
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Editar", "Edit", new { id = item.VIANRO }, new { @class = "btn btn-info" })
+
+                            <a href="javascript:ConfirmarDelete(@item.VIANRO)" class="btn btn-danger">Eliminar</a>
+                        }
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    <script type="text/javascript">
+
+        $(document).ready(
+            function () {
+                var table = $('#DataListar')
+                    .DataTable(
+                        {
+                            language: {
+                                "lengthMenu": "Mostrar _MENU_ registros",
+                                "zeroRecords": "No se encontraron resultados",
+                                "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                                "infoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                                "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                                "sSearch": "Buscar:",
+                                "oPaginate": {
+                                    "sFirst": "Primero",
+                                    "sLast": "Último",
+                                    "sNext": "Siguiente",
+                                    "sPrevious": "Anterior"
+                                },
+                                "sProcessing": "Procesando...",
+                            }
+                        });
+            });
+    </script>
+</body>
+</html>

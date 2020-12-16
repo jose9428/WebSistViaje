@@ -1,0 +1,124 @@
+﻿@model IEnumerable<SisWebViaje.Models.Chofer>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Listado</title>
+</head>
+<body>
+    @{
+        if (@TempData["mensaje"] != null)
+        {
+            <div class="alert alert-success" role="alert">
+                @TempData["mensaje"]
+            </div>
+        }
+    }
+
+    <table class="table table-hover text-center " id="DataListar">
+        <thead style="background: #04429C; color:#ffffff;">
+            <tr>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.IDCOD)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.CHONOM)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.CHOFIN)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.CHOCAT)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.CHOSBA)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.CHOIMG)
+                </th>
+                <th class="text-center">
+                    Viajes
+                </th>
+                <th class="text-center">
+                    Acciones
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                string categoria = "";
+                foreach (var item in Model)
+                {
+                    if (item.CHOCAT == "P")
+                    {
+                        categoria = "Profesional";
+                    }
+                    else
+                    {
+                        categoria = "Semi-Profesional";
+                    }
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IDCOD)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CHONOM)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CHOFIN)
+                            </td>
+                            <td>
+                                @categoria
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CHOSBA)
+                            </td>
+                            <td>
+                                <img src="@Url.Content("~/Content/Imagen/" + item.CHOIMG)" onerror="src='@Url.Content("~/Content/Imagen/sin_imagen.png")'" width="90" height="95" />
+                            </td>
+                            <td>
+                                @Html.ActionLink("Ver", null, null, new { @class = "btn btn-primary" , onclick = "return VerDetalle('"+item.IDCOD+"' , '"+item.CHONOM+ "', '" + categoria + "' , '" + item.CHOIMG + "')" })
+                            </td>
+                            <td>
+                                @Html.ActionLink("Editar", "Edit", new { id = item.IDCOD }, new { @class = "btn btn-info" })
+                                <a href="javascript:ConfirmarDelete('@item.IDCOD')" class="btn btn-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+
+        $(document).ready(
+            function () {
+                var table = $('#DataListar')
+                    .DataTable(
+                        {
+                            language: {
+                                "lengthMenu": "Mostrar _MENU_ registros",
+                                "zeroRecords": "No se encontraron resultados",
+                                "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                                "infoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                                "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                                "sSearch": "Buscar:",
+                                "oPaginate": {
+                                    "sFirst": "Primero",
+                                    "sLast": "Último",
+                                    "sNext": "Siguiente",
+                                    "sPrevious": "Anterior"
+                                },
+                                "sProcessing": "Procesando...",
+                            }
+                        });
+            });
+    </script>
+</body>
+</html>

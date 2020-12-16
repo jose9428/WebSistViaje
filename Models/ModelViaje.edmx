@@ -1,0 +1,543 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SistViajeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Bus">
+          <Key>
+            <PropertyRef Name="BUSNRO" />
+          </Key>
+          <Property Name="BUSNRO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BUSPLA" Type="varchar" MaxLength="8" />
+          <Property Name="BUSCAP" Type="numeric" Precision="8" Scale="0" />
+        </EntityType>
+        <EntityType Name="Chofer">
+          <Key>
+            <PropertyRef Name="IDCOD" />
+          </Key>
+          <Property Name="IDCOD" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="CHONOM" Type="varchar" MaxLength="30" />
+          <Property Name="CHOFIN" Type="date" />
+          <Property Name="CHOCAT" Type="varchar" MaxLength="2" />
+          <Property Name="CHOSBA" Type="numeric" Precision="8" Scale="0" />
+          <Property Name="CHOIMG" Type="varchar" MaxLength="120" />
+        </EntityType>
+        <EntityType Name="Pasajeros">
+          <Key>
+            <PropertyRef Name="BOLNRO" />
+          </Key>
+          <Property Name="BOLNRO" Type="char" MaxLength="6" Nullable="false" />
+          <Property Name="VIANRO" Type="char" MaxLength="6" />
+          <Property Name="NOM_PAS" Type="varchar" MaxLength="30" />
+          <Property Name="NRO_ASI" Type="int" />
+          <Property Name="TIPO" Type="char" MaxLength="1" />
+          <Property Name="PAGO" Type="numeric" Precision="8" Scale="0" />
+        </EntityType>
+        <EntityType Name="Ruta">
+          <Key>
+            <PropertyRef Name="RUTCOD" />
+          </Key>
+          <Property Name="RUTCOD" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="RUTNOM" Type="varchar" MaxLength="20" />
+          <Property Name="PAGOOCHO" Type="numeric" Precision="8" Scale="0" />
+          <Property Name="RUTIMG" Type="varchar" MaxLength="120" />
+        </EntityType>
+        <EntityType Name="Usuarios">
+          <Key>
+            <PropertyRef Name="codusr" />
+          </Key>
+          <Property Name="codusr" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="usuario" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="clave" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Viaje">
+          <Key>
+            <PropertyRef Name="VIANRO" />
+          </Key>
+          <Property Name="VIANRO" Type="char" MaxLength="6" Nullable="false" />
+          <Property Name="BUSNRO" Type="int" />
+          <Property Name="RUTCOD" Type="varchar" MaxLength="8" />
+          <Property Name="IDCOD" Type="char" MaxLength="4" />
+          <Property Name="VIAHRS" Type="char" MaxLength="5" />
+          <Property Name="VIAFCH" Type="date" />
+          <Property Name="COSVIA" Type="numeric" Precision="8" Scale="0" />
+        </EntityType>
+        <Association Name="FK__Pasajeros__VIANR__1B0907CE">
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="0..1" />
+          <End Role="Pasajeros" Type="Self.Pasajeros" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Viaje">
+              <PropertyRef Name="VIANRO" />
+            </Principal>
+            <Dependent Role="Pasajeros">
+              <PropertyRef Name="VIANRO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Viaje__BUSNRO__164452B1">
+          <End Role="Bus" Type="Self.Bus" Multiplicity="0..1" />
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Bus">
+              <PropertyRef Name="BUSNRO" />
+            </Principal>
+            <Dependent Role="Viaje">
+              <PropertyRef Name="BUSNRO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Viaje__IDCOD__182C9B23">
+          <End Role="Chofer" Type="Self.Chofer" Multiplicity="0..1" />
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Chofer">
+              <PropertyRef Name="IDCOD" />
+            </Principal>
+            <Dependent Role="Viaje">
+              <PropertyRef Name="IDCOD" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Viaje__RUTCOD__173876EA">
+          <End Role="Ruta" Type="Self.Ruta" Multiplicity="0..1" />
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ruta">
+              <PropertyRef Name="RUTCOD" />
+            </Principal>
+            <Dependent Role="Viaje">
+              <PropertyRef Name="RUTCOD" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="sp_adicionar_chofer" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="nomChofer" Type="varchar" Mode="In" />
+          <Parameter Name="fechaIng" Type="date" Mode="In" />
+          <Parameter Name="categoria" Type="varchar" Mode="In" />
+          <Parameter Name="costo" Type="numeric" Mode="In" />
+          <Parameter Name="foto" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="sp_adicionar_pasajeros" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="VIA" Type="char" Mode="In" />
+          <Parameter Name="NOM" Type="varchar" Mode="In" />
+          <Parameter Name="ASI" Type="int" Mode="In" />
+          <Parameter Name="TP" Type="char" Mode="In" />
+          <Parameter Name="PG" Type="numeric" Mode="In" />
+        </Function>
+        <Function Name="sp_adicionar_viaje" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="bus" Type="int" Mode="In" />
+          <Parameter Name="ruta" Type="char" Mode="In" />
+          <Parameter Name="chofer" Type="char" Mode="In" />
+          <Parameter Name="hora" Type="char" Mode="In" />
+          <Parameter Name="fecha" Type="date" Mode="In" />
+          <Parameter Name="costo" Type="numeric" Mode="In" />
+        </Function>
+        <Function Name="sp_iniciar_sesion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="user" Type="varchar" Mode="In" />
+          <Parameter Name="pass" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="sp_logear" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="user" Type="varchar" Mode="In" />
+          <Parameter Name="pass" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="sp_reporte_cant_chofer" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="sp_reporte_total_mes" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="anio" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_reporte_total_ruta" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="SistViajeModelStoreContainer">
+          <EntitySet Name="Bus" EntityType="Self.Bus" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Chofer" EntityType="Self.Chofer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pasajeros" EntityType="Self.Pasajeros" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ruta" EntityType="Self.Ruta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Viaje" EntityType="Self.Viaje" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Pasajeros__VIANR__1B0907CE" Association="Self.FK__Pasajeros__VIANR__1B0907CE">
+            <End Role="Viaje" EntitySet="Viaje" />
+            <End Role="Pasajeros" EntitySet="Pasajeros" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Viaje__BUSNRO__164452B1" Association="Self.FK__Viaje__BUSNRO__164452B1">
+            <End Role="Bus" EntitySet="Bus" />
+            <End Role="Viaje" EntitySet="Viaje" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Viaje__IDCOD__182C9B23" Association="Self.FK__Viaje__IDCOD__182C9B23">
+            <End Role="Chofer" EntitySet="Chofer" />
+            <End Role="Viaje" EntitySet="Viaje" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Viaje__RUTCOD__173876EA" Association="Self.FK__Viaje__RUTCOD__173876EA">
+            <End Role="Ruta" EntitySet="Ruta" />
+            <End Role="Viaje" EntitySet="Viaje" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SistViajeModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Bus">
+          <Key>
+            <PropertyRef Name="BUSNRO" />
+          </Key>
+          <Property Name="BUSNRO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BUSPLA" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="BUSCAP" Type="Decimal" Precision="8" Scale="0" />
+          <NavigationProperty Name="Viaje" Relationship="Self.FK__Viaje__BUSNRO__164452B1" FromRole="Bus" ToRole="Viaje" />
+        </EntityType>
+        <EntityType Name="Chofer">
+          <Key>
+            <PropertyRef Name="IDCOD" />
+          </Key>
+          <Property Name="IDCOD" Type="String" MaxLength="4" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="CHONOM" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="CHOFIN" Type="DateTime" Precision="0" />
+          <Property Name="CHOCAT" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="CHOSBA" Type="Decimal" Precision="8" Scale="0" />
+          <Property Name="CHOIMG" Type="String" MaxLength="120" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Viaje" Relationship="Self.FK__Viaje__IDCOD__182C9B23" FromRole="Chofer" ToRole="Viaje" />
+        </EntityType>
+        <EntityType Name="Pasajeros">
+          <Key>
+            <PropertyRef Name="BOLNRO" />
+          </Key>
+          <Property Name="BOLNRO" Type="String" MaxLength="6" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="VIANRO" Type="String" MaxLength="6" FixedLength="true" Unicode="false" />
+          <Property Name="NOM_PAS" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NRO_ASI" Type="Int32" />
+          <Property Name="TIPO" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="PAGO" Type="Decimal" Precision="8" Scale="0" />
+          <NavigationProperty Name="Viaje" Relationship="Self.FK__Pasajeros__VIANR__1B0907CE" FromRole="Pasajeros" ToRole="Viaje" />
+        </EntityType>
+        <EntityType Name="Ruta">
+          <Key>
+            <PropertyRef Name="RUTCOD" />
+          </Key>
+          <Property Name="RUTCOD" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RUTNOM" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="PAGOOCHO" Type="Decimal" Precision="8" Scale="0" />
+          <Property Name="RUTIMG" Type="String" MaxLength="120" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Viaje" Relationship="Self.FK__Viaje__RUTCOD__173876EA" FromRole="Ruta" ToRole="Viaje" />
+        </EntityType>
+        <EntityType Name="Viaje">
+          <Key>
+            <PropertyRef Name="VIANRO" />
+          </Key>
+          <Property Name="VIANRO" Type="String" MaxLength="6" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="BUSNRO" Type="Int32" />
+          <Property Name="RUTCOD" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="IDCOD" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="VIAHRS" Type="String" MaxLength="5" FixedLength="true" Unicode="false" />
+          <Property Name="VIAFCH" Type="DateTime" Precision="0" />
+          <Property Name="COSVIA" Type="Decimal" Precision="8" Scale="0" />
+          <NavigationProperty Name="Bus" Relationship="Self.FK__Viaje__BUSNRO__164452B1" FromRole="Viaje" ToRole="Bus" />
+          <NavigationProperty Name="Chofer" Relationship="Self.FK__Viaje__IDCOD__182C9B23" FromRole="Viaje" ToRole="Chofer" />
+          <NavigationProperty Name="Pasajeros" Relationship="Self.FK__Pasajeros__VIANR__1B0907CE" FromRole="Viaje" ToRole="Pasajeros" />
+          <NavigationProperty Name="Ruta" Relationship="Self.FK__Viaje__RUTCOD__173876EA" FromRole="Viaje" ToRole="Ruta" />
+        </EntityType>
+        <Association Name="FK__Viaje__BUSNRO__164452B1">
+          <End Role="Bus" Type="Self.Bus" Multiplicity="0..1" />
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Bus">
+              <PropertyRef Name="BUSNRO" />
+            </Principal>
+            <Dependent Role="Viaje">
+              <PropertyRef Name="BUSNRO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Viaje__IDCOD__182C9B23">
+          <End Role="Chofer" Type="Self.Chofer" Multiplicity="0..1" />
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Chofer">
+              <PropertyRef Name="IDCOD" />
+            </Principal>
+            <Dependent Role="Viaje">
+              <PropertyRef Name="IDCOD" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Pasajeros__VIANR__1B0907CE">
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="0..1" />
+          <End Role="Pasajeros" Type="Self.Pasajeros" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Viaje">
+              <PropertyRef Name="VIANRO" />
+            </Principal>
+            <Dependent Role="Pasajeros">
+              <PropertyRef Name="VIANRO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Viaje__RUTCOD__173876EA">
+          <End Role="Ruta" Type="Self.Ruta" Multiplicity="0..1" />
+          <End Role="Viaje" Type="Self.Viaje" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ruta">
+              <PropertyRef Name="RUTCOD" />
+            </Principal>
+            <Dependent Role="Viaje">
+              <PropertyRef Name="RUTCOD" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="SistViajeEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Bus" EntityType="Self.Bus" />
+          <EntitySet Name="Chofer" EntityType="Self.Chofer" />
+          <EntitySet Name="Pasajeros" EntityType="Self.Pasajeros" />
+          <EntitySet Name="Ruta" EntityType="Self.Ruta" />
+          <EntitySet Name="Viaje" EntityType="Self.Viaje" />
+          <AssociationSet Name="FK__Viaje__BUSNRO__164452B1" Association="Self.FK__Viaje__BUSNRO__164452B1">
+            <End Role="Bus" EntitySet="Bus" />
+            <End Role="Viaje" EntitySet="Viaje" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Viaje__IDCOD__182C9B23" Association="Self.FK__Viaje__IDCOD__182C9B23">
+            <End Role="Chofer" EntitySet="Chofer" />
+            <End Role="Viaje" EntitySet="Viaje" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Pasajeros__VIANR__1B0907CE" Association="Self.FK__Pasajeros__VIANR__1B0907CE">
+            <End Role="Viaje" EntitySet="Viaje" />
+            <End Role="Pasajeros" EntitySet="Pasajeros" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Viaje__RUTCOD__173876EA" Association="Self.FK__Viaje__RUTCOD__173876EA">
+            <End Role="Ruta" EntitySet="Ruta" />
+            <End Role="Viaje" EntitySet="Viaje" />
+          </AssociationSet>
+          <FunctionImport Name="sp_adicionar_chofer">
+            <Parameter Name="nomChofer" Mode="In" Type="String" />
+            <Parameter Name="fechaIng" Mode="In" Type="DateTime" />
+            <Parameter Name="categoria" Mode="In" Type="String" />
+            <Parameter Name="costo" Mode="In" Type="Decimal" />
+            <Parameter Name="foto" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_adicionar_viaje">
+            <Parameter Name="bus" Mode="In" Type="Int32" />
+            <Parameter Name="ruta" Mode="In" Type="String" />
+            <Parameter Name="chofer" Mode="In" Type="String" />
+            <Parameter Name="hora" Mode="In" Type="String" />
+            <Parameter Name="fecha" Mode="In" Type="DateTime" />
+            <Parameter Name="costo" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <FunctionImport Name="sp_adicionar_pasajero" ReturnType="Collection(SistViajeModel.sp_adicionar_pasajero_Result)">
+            <Parameter Name="VIA" Mode="In" Type="String" />
+            <Parameter Name="NOM" Mode="In" Type="String" />
+            <Parameter Name="ASI" Mode="In" Type="Int32" />
+            <Parameter Name="TP" Mode="In" Type="String" />
+            <Parameter Name="PG" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <FunctionImport Name="sp_adicionar_pasajeros">
+            <Parameter Name="VIA" Mode="In" Type="String" />
+            <Parameter Name="NOM" Mode="In" Type="String" />
+            <Parameter Name="ASI" Mode="In" Type="Int32" />
+            <Parameter Name="TP" Mode="In" Type="String" />
+            <Parameter Name="PG" Mode="In" Type="Decimal" />
+          </FunctionImport>
+          <FunctionImport Name="sp_iniciar_sesion" ReturnType="Collection(SistViajeModel.sp_iniciar_sesion_Result)">
+            <Parameter Name="user" Mode="In" Type="String" />
+            <Parameter Name="pass" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="Usuarios" EntityType="SistViajeModel.Usuarios" />
+          <FunctionImport Name="sp_logear" ReturnType="Collection(SistViajeModel.sp_logear_Result)">
+            <Parameter Name="user" Mode="In" Type="String" />
+            <Parameter Name="pass" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_reporte_total_ruta" ReturnType="Collection(SistViajeModel.sp_reporte_total_ruta_Result)" />
+          <FunctionImport Name="sp_reporte_cant_chofer" ReturnType="Collection(SistViajeModel.sp_reporte_cant_chofer_Result)" />
+          <FunctionImport Name="sp_reporte_total_mes" ReturnType="Collection(SistViajeModel.sp_reporte_total_mes_Result)">
+          <Parameter Name="anio" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_adicionar_viaje1">
+            <Parameter Name="bus" Mode="In" Type="Int32" />
+            <Parameter Name="ruta" Mode="In" Type="String" />
+            <Parameter Name="chofer" Mode="In" Type="String" />
+            <Parameter Name="hora" Mode="In" Type="String" />
+            <Parameter Name="fecha" Mode="In" Type="DateTime" />
+            <Parameter Name="costo" Mode="In" Type="Decimal" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="sp_adicionar_pasajero_Result">
+          <Property Type="String" Name="BOLNRO" Nullable="false" MaxLength="6" />
+          <Property Type="String" Name="VIANRO" Nullable="true" MaxLength="6" />
+          <Property Type="String" Name="NOM_PAS" Nullable="true" MaxLength="30" />
+          <Property Type="Int32" Name="NRO_ASI" Nullable="true" />
+          <Property Type="String" Name="TIPO" Nullable="true" MaxLength="1" />
+          <Property Type="Decimal" Name="PAGO" Nullable="true" Precision="8" Scale="0" />
+        </ComplexType>
+        <ComplexType Name="sp_iniciar_sesion_Result">
+          <Property Type="Int32" Name="codusr" Nullable="false" />
+          <Property Type="String" Name="Nombre" Nullable="false" MaxLength="30" />
+          <Property Type="String" Name="usuario" Nullable="false" MaxLength="10" />
+          <Property Type="String" Name="clave" Nullable="false" MaxLength="10" />
+        </ComplexType>
+        <EntityType Name="Usuarios">
+          <Key>
+            <PropertyRef Name="codusr" />
+          </Key>
+          <Property Name="codusr" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="usuario" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="clave" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <ComplexType Name="sp_logear_Result">
+          <Property Type="Int32" Name="codusr" Nullable="false" />
+          <Property Type="String" Name="Nombre" Nullable="false" MaxLength="30" />
+          <Property Type="String" Name="usuario" Nullable="false" MaxLength="10" />
+          <Property Type="String" Name="clave" Nullable="false" MaxLength="10" />
+        </ComplexType>
+        <ComplexType Name="sp_reporte_total_ruta_Result">
+          <Property Type="String" Name="ruta" Nullable="true" MaxLength="20" />
+          <Property Type="Decimal" Name="total" Nullable="true" Precision="38" Scale="0" />
+        </ComplexType>
+        <ComplexType Name="sp_reporte_cant_chofer_Result">
+          <Property Type="String" Name="chofer" Nullable="true" MaxLength="30" />
+          <Property Type="Int32" Name="cant" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="sp_reporte_total_mes_Result">
+          <Property Type="String" Name="mes" Nullable="true" MaxLength="30" />
+          <Property Type="Decimal" Name="total" Nullable="true" Precision="38" Scale="0" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SistViajeModelStoreContainer" CdmEntityContainer="SistViajeEntities">
+          <EntitySetMapping Name="Bus">
+            <EntityTypeMapping TypeName="SistViajeModel.Bus">
+              <MappingFragment StoreEntitySet="Bus">
+                <ScalarProperty Name="BUSNRO" ColumnName="BUSNRO" />
+                <ScalarProperty Name="BUSPLA" ColumnName="BUSPLA" />
+                <ScalarProperty Name="BUSCAP" ColumnName="BUSCAP" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Chofer">
+            <EntityTypeMapping TypeName="SistViajeModel.Chofer">
+              <MappingFragment StoreEntitySet="Chofer">
+                <ScalarProperty Name="IDCOD" ColumnName="IDCOD" />
+                <ScalarProperty Name="CHONOM" ColumnName="CHONOM" />
+                <ScalarProperty Name="CHOFIN" ColumnName="CHOFIN" />
+                <ScalarProperty Name="CHOCAT" ColumnName="CHOCAT" />
+                <ScalarProperty Name="CHOSBA" ColumnName="CHOSBA" />
+                <ScalarProperty Name="CHOIMG" ColumnName="CHOIMG" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Pasajeros">
+            <EntityTypeMapping TypeName="SistViajeModel.Pasajeros">
+              <MappingFragment StoreEntitySet="Pasajeros">
+                <ScalarProperty Name="BOLNRO" ColumnName="BOLNRO" />
+                <ScalarProperty Name="VIANRO" ColumnName="VIANRO" />
+                <ScalarProperty Name="NOM_PAS" ColumnName="NOM_PAS" />
+                <ScalarProperty Name="NRO_ASI" ColumnName="NRO_ASI" />
+                <ScalarProperty Name="TIPO" ColumnName="TIPO" />
+                <ScalarProperty Name="PAGO" ColumnName="PAGO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ruta">
+            <EntityTypeMapping TypeName="SistViajeModel.Ruta">
+              <MappingFragment StoreEntitySet="Ruta">
+                <ScalarProperty Name="RUTCOD" ColumnName="RUTCOD" />
+                <ScalarProperty Name="RUTNOM" ColumnName="RUTNOM" />
+                <ScalarProperty Name="PAGOOCHO" ColumnName="PAGOOCHO" />
+                <ScalarProperty Name="RUTIMG" ColumnName="RUTIMG" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Viaje">
+            <EntityTypeMapping TypeName="SistViajeModel.Viaje">
+              <MappingFragment StoreEntitySet="Viaje">
+                <ScalarProperty Name="VIANRO" ColumnName="VIANRO" />
+                <ScalarProperty Name="BUSNRO" ColumnName="BUSNRO" />
+                <ScalarProperty Name="RUTCOD" ColumnName="RUTCOD" />
+                <ScalarProperty Name="IDCOD" ColumnName="IDCOD" />
+                <ScalarProperty Name="VIAHRS" ColumnName="VIAHRS" />
+                <ScalarProperty Name="VIAFCH" ColumnName="VIAFCH" />
+                <ScalarProperty Name="COSVIA" ColumnName="COSVIA" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_adicionar_chofer" FunctionName="SistViajeModel.Store.sp_adicionar_chofer" />
+          <FunctionImportMapping FunctionImportName="sp_adicionar_pasajeros" FunctionName="SistViajeModel.Store.sp_adicionar_pasajeros" />
+          <FunctionImportMapping FunctionImportName="sp_iniciar_sesion" FunctionName="SistViajeModel.Store.sp_iniciar_sesion">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SistViajeModel.sp_iniciar_sesion_Result">
+                <ScalarProperty Name="codusr" ColumnName="codusr" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="usuario" ColumnName="usuario" />
+                <ScalarProperty Name="clave" ColumnName="clave" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="Usuarios">
+            <EntityTypeMapping TypeName="SistViajeModel.Usuarios">
+              <MappingFragment StoreEntitySet="Usuarios">
+                <ScalarProperty Name="clave" ColumnName="clave" />
+                <ScalarProperty Name="usuario" ColumnName="usuario" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="codusr" ColumnName="codusr" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_logear" FunctionName="SistViajeModel.Store.sp_logear">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SistViajeModel.sp_logear_Result">
+                <ScalarProperty Name="codusr" ColumnName="codusr" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="usuario" ColumnName="usuario" />
+                <ScalarProperty Name="clave" ColumnName="clave" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_reporte_total_ruta" FunctionName="SistViajeModel.Store.sp_reporte_total_ruta">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SistViajeModel.sp_reporte_total_ruta_Result">
+                <ScalarProperty Name="ruta" ColumnName="ruta" />
+                <ScalarProperty Name="total" ColumnName="total" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_reporte_cant_chofer" FunctionName="SistViajeModel.Store.sp_reporte_cant_chofer">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SistViajeModel.sp_reporte_cant_chofer_Result">
+                <ScalarProperty Name="chofer" ColumnName="chofer" />
+                <ScalarProperty Name="cant" ColumnName="cant" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_reporte_total_mes" FunctionName="SistViajeModel.Store.sp_reporte_total_mes">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SistViajeModel.sp_reporte_total_mes_Result">
+                <ScalarProperty Name="mes" ColumnName="mes" />
+                <ScalarProperty Name="total" ColumnName="total" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_adicionar_viaje1" FunctionName="SistViajeModel.Store.sp_adicionar_viaje" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

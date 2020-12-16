@@ -1,0 +1,83 @@
+﻿@model IEnumerable<SisWebViaje.Models.Viaje>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+
+<p>
+    @Html.ActionLink("Nuevo Viaje", "Create", null, new { @class = "btn btn-success", title = "Ir a registrar nuevo viaje" })
+</p>
+
+<div id="resultado">
+
+</div>
+<script type="text/javascript">
+    $(function () {
+        CargarListado();
+    });
+
+    function ConfirmarDelete(nroViaje) {
+        bootbox.confirm({
+            message: "¿Esta Seguro que desea eliminar el viaje con nro " + nroViaje + " ?",
+            buttons: {
+                confirm: {
+                    label: 'Si',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("ConfEliminar" , "Viaje")",
+                        content: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: {
+                            id: nroViaje
+                        },
+                        success: function (d) {
+                            if (d.resultado > 0) {
+                                CargarListado();
+                            }
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            Mensaje('Error Imposible eliminar por que ya hay pasajeros registrados en este viaje.');
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+    function CargarListado() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("ListadoViaje" , "Viaje")",
+            dataType: "html",
+            beforeSend: function () {
+                $("#resultado").html("Cargando...");
+            },
+            success: function (data) {
+                $("#resultado").html(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Error Imposible cargar datos.');
+            }
+        });
+    }
+
+    function Mensaje(cadena) {
+        bootbox.alert({
+            message: cadena,
+            backdrop: true
+        });
+    }
+</script>

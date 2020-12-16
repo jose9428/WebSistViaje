@@ -1,0 +1,94 @@
+﻿@model IEnumerable<SisWebViaje.Models.Viaje>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ListadoViajes</title>
+</head>
+<body>
+    @{
+        if (@TempData["mensaje"] != null)
+        {
+            <div class="alert alert-success" role="alert">
+                @TempData["mensaje"]
+            </div>
+        }
+    }
+
+    <table class="table table-hover text-center" id="DataListar">
+        <thead style="background: #04429C; color:#ffffff;">
+            <tr>
+                <th class="text-center">
+                    Nro Viaje
+                </th>
+                <th class="text-center">
+                    Fecha
+                </th>
+                <th class="text-center">
+                    Hora
+                </th>
+                <th class="text-center">
+                    Costo
+                </th>
+                <th class="text-center">
+                    Pasajeros
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td>@item.VIANRO</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VIAFCH)
+                </td>
+                <td>@item.VIAHRS</td>
+                <td>@item.COSVIA</td>
+                <td>
+                    @Html.ActionLink("Ver", "Listar", new { id = item.VIANRO }, new { @class = "btn btn-info" })
+
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+
+        $(document).ready(
+            function () {
+                var table = $('#DataListar')
+                    .DataTable(
+                        {
+                            language: {
+                                "lengthMenu": "Mostrar _MENU_ registros",
+                                "zeroRecords": "No se encontraron resultados",
+                                "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                                "infoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                                "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                                "sSearch": "Buscar:",
+                                "oPaginate": {
+                                    "sFirst": "Primero",
+                                    "sLast": "Último",
+                                    "sNext": "Siguiente",
+                                    "sPrevious": "Anterior"
+                                },
+                                "sProcessing": "Procesando...",
+                            },
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": true,
+                            "bInfo": true,
+                            "bAutoWidth": false
+                        });
+            });
+    </script>
+</body>
+</html>

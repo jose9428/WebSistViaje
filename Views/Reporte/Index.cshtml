@@ -1,0 +1,245 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<span class="badge badge-pill badge-success" style="font-size:15px;">REPORTE</span>
+<br />
+<br />
+
+<div>
+    <div class="form-group row" style="border:groove;">
+        <div class="col-sm-6" id="grafica1">
+
+        </div>
+        <div class="col-sm-6" id="grafica2">
+
+        </div>
+    </div>
+
+    <div class="form-group row" style="border:groove;">
+        <div class="col-sm-12" id="grafica3">
+
+        </div>
+    </div>
+    <button id="plain" class="btn btn-info">Normal</button>
+    <button id="inverted" class="btn btn-primary">Invertido</button>
+</div>
+<script src="~/Scripts/Grafica/highcharts.js"></script>
+<script src="~/Scripts/Grafica/exporting.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        CargarGrafica1();
+        CargarGrafica2();
+        CargarGrafica3();
+    });
+    var chart;
+
+    function CargarGrafica3() { 
+        var Anioactual = 2020;
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("ReportePorMes", "Reporte")",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            data: {
+                anio : Anioactual
+            }, beforeSend: function () {
+                $("#grafica3").html("Cargando...");
+            },
+            success: function (resultado) {
+                var dataMes = [];
+                var dataTotal = [];
+                for (var i in resultado) {
+                    dataMes.push(resultado[i].mes);
+                    dataTotal.push(resultado[i].total);
+                }
+                Grafica3(dataMes, dataTotal);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert("Error al cargar datos");
+            }
+        });
+    }
+
+    function Grafica3(mes , totales) {
+        chart = Highcharts.chart('grafica3', {
+
+            title: {
+                text: 'REPORTE MENSUAL DEL AÑO 2020'
+            },
+
+            subtitle: {
+                text: 'Total por mes'
+            },
+
+            xAxis: {
+                categories: mes
+            },
+
+            series: [{
+                type: 'column',
+                colorByPoint: true,
+                data: totales,
+                name: 'Total S/',
+                showInLegend: false
+            }]
+
+        });
+    }
+
+    $('#plain').click(function () {
+        chart.update({
+            chart: {
+                inverted: false,
+                polar: false
+            },
+            subtitle: {
+                text: 'Total por mes'
+            }
+        });
+    });
+
+    $('#inverted').click(function () {
+        chart.update({
+            chart: {
+                inverted: true,
+                polar: false
+            },
+            subtitle: {
+                text: 'Total por mes'
+            }
+        });
+    });
+
+    function CargarGrafica1() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("ReportePorRuta", "Reporte")",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+            $("#grafica1").html("Cargando...");
+            },
+            success: function (resultado) {
+                var data = [];
+                for (var i in resultado) {
+                    var serie = new Array(resultado[i].ruta, resultado[i].total);
+                    data.push(serie);
+                }
+                Grafica(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert("Error al cargar datos");
+            }
+        });
+    }
+
+     function CargarGrafica2() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("ReportePorChofer", "Reporte")",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                $("#grafica2").html("Cargando...");
+            },
+            success: function (resultado) {
+                var data = [];
+                for (var i in resultado) {
+                    var serie = new Array(resultado[i].chofer, resultado[i].cant);
+                    data.push(serie);
+                }
+                Grafica2(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert("Error al cargar datos");
+            }
+        });
+    }
+
+    function Grafica(resultado) {
+        Highcharts.chart('grafica1', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: true,
+                    alpha: 45,
+                    beta: 0
+                }
+            },
+            title: {
+                text: 'REPORTE PAGO TOTAL POR RUTA'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            tooltip: {
+               // pointFormat: '{series.name}: <b>{point.percentage:.1f}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    depth: 35,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}'
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Total S/',
+                data: resultado
+            }]
+        });
+    }
+
+    function Grafica2(resultado) {
+        Highcharts.chart('grafica2', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: true,
+                    alpha: 45,
+                    beta: 0
+                }
+            },
+            title: {
+                text: 'REPORTE CANTIDAD DE VIAJES POR CHOFER'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            tooltip: {
+               // pointFormat: '{series.name}: <b>{point.percentage:.1f}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    depth: 35,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}'
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Cantidad',
+                data: resultado
+            }]
+        });
+    }
+</script>
+

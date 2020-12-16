@@ -1,0 +1,197 @@
+﻿@model IEnumerable<SisWebViaje.Models.Chofer>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+
+<p>
+    @Html.ActionLink("Nuevo Chofer", "Create", null, new { @class = "btn btn-success", title = "Ir a registrar nuevo chofer" })
+</p>
+
+<div id="resultado">
+
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="ModalDetalle" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #04429C;color:#fff">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Detalle Chofer</h4>
+            </div>
+            <div class="modal-body">
+                <div class="card table-bordered">
+
+                    <div class="form-group row">
+                        <div class="col-sm-2" style="margin-left:10px; margin-top:10px;">
+                            
+                            <img src="@Url.Content("~/Content/Imagen/sin_imagen.png")" id="ImgDetalle" width="140" height="110" class="img-thumbnail" />
+                        </div>
+                        <div class="col-sm-6">
+                            <br />
+                            <table class=" img-rounded" style="margin:6px; width:60%;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">
+                                            <h5> <strong>Chofer : </strong></h5>
+                                        </th>
+                                        <th><h5 id="NomChofer"></h5></th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">
+                                            <h5> <strong>Categoria : </strong></h5>
+                                        </th>
+                                        <th><h5 id="CatChofer"></h5></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <table class="table table-hover  table-striped " style="margin:20px auto;width: 90%; ">
+                            <thead>
+                                <tr>
+                                    <th>Nro Viaje</th>
+                                    <th>Ruta</th>
+                                    <th>Fecha</th>
+                                    <th>Costo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rDetalle">
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button id="btnCancelar" type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        CargarListado();
+    });
+
+    function VerDetalle(idChofer, nomChofer, catChofer , imgChofer)
+    {
+        $("#ModalDetalle").modal("show");
+        $("#CatChofer").html(catChofer);
+        $("#NomChofer").html(nomChofer);
+
+        var url = '@Url.Content("~")';
+        var ruta = url + "Content/Imagen/" + imgChofer;
+
+        $("#ImgDetalle").attr("src",ruta);
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("DetalleChofer", "Chofer")",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            data: {
+                id: idChofer
+            },
+            beforeSend: function () {
+                $("#rDetalle").html("Cargando...");
+            },
+            success: function (data) {
+                var cadena = "";
+                var cuenta = 0;
+                $.each(data, function (i, item) {
+                    cadena += "<tr>";
+                    cadena += "<td>" + item.VIANRO+"</td>";
+                    cadena += "<td>" + item.RUTNOM + "</td>";
+                    cadena += "<td>" + item.VIAFCHA + "</td>";
+                    cadena += "<td>" + item.COSVIA + "</td>";
+                    cadena += "</tr>";
+                    cuenta++;
+                });
+
+                if (cuenta == 0) {
+                    $("#rDetalle").html("<br>Sin resultados..");
+                } else {
+                    $("#rDetalle").html(cadena);
+                }
+
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Imposible Cargar...');
+            }
+        });
+
+        return false;
+    }
+
+
+    function ConfirmarDelete(codChofer) {
+        bootbox.confirm({
+            message: "¿Esta Seguro que desea eliminar la ruta con codigo " + codChofer + "?",
+            buttons: {
+                confirm: {
+                    label: 'Si',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("Eliminar" , "Chofer")",
+                        content: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: {
+                            id: codChofer
+                        },
+                        success: function (d) {
+                            if (d.resultado > 0) {
+                                CargarListado();
+                            }
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            Mensaje('Error Imposible eliminar por que hay registros en las sub tablas.');
+                        }
+                    });
+                }
+
+            }
+        });
+    }
+
+    function CargarListado() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("Listado" , "Chofer")",
+            dataType: "html",
+            beforeSend: function () {
+                $("#resultado").html("Cargando...");
+            },
+            success: function (data) {
+                $("#resultado").html(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Error Imposible cargar datos.');
+            }
+        });
+    }
+
+    function Mensaje(cadena) {
+        bootbox.alert({
+            message: cadena,
+            backdrop: true
+        });
+    }
+</script>

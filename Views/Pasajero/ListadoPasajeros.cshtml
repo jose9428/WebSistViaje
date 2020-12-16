@@ -1,0 +1,126 @@
+﻿@model IEnumerable<SisWebViaje.Models.Pasajeros>
+
+@{
+    Layout = null;
+    string FecViaje = ViewBag.FechaViaje;
+    DateTime FechaActual = DateTime.Now.Date;
+    DateTime FechaViaje = Convert.ToDateTime(FecViaje).Date;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ListadoPasajeros</title>
+</head>
+<body>
+    <table class="table table-hover text-center" id="DataListar">
+        <thead style="background: #04429C; color:#ffffff;">
+            <tr>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.BOLNRO)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.NOM_PAS)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.NRO_ASI)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.TIPO)
+                </th>
+                <th class="text-center">
+                    @Html.DisplayNameFor(model => model.PAGO)
+                </th>
+                @{
+                    if (FechaViaje > FechaActual)
+                    {
+                        <th class="text-center">
+                            Accion
+                        </th>
+                    }
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (var item in Model)
+                {
+                    string tipo = "";
+                    if (item.TIPO.Equals("N"))
+                    {
+                        tipo = "Niño";
+                    }
+                    else if (item.TIPO.Equals("E"))
+                    {
+                        tipo = "Estudiante";
+                    }
+                    else if (item.TIPO.Equals("A"))
+                    {
+                        tipo = "Adulto";
+                    }
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BOLNRO)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NOM_PAS)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NRO_ASI)
+                        </td>
+                        <td>
+                            @tipo
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PAGO)
+                        </td>
+
+                        @{
+                            if (FechaViaje > FechaActual)
+                            {
+                                <td>
+                                    <a href="javascript:ConfirmarDelete('@item.BOLNRO')" class="btn btn-danger">Eliminar</a>
+                                </td>
+                            }
+                        }
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+
+        $(document).ready(
+            function () {
+                var table = $('#DataListar')
+                    .DataTable(
+                        {
+                            language: {
+                                "lengthMenu": "Mostrar _MENU_ registros",
+                                "zeroRecords": "No se encontraron resultados",
+                                "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                                "infoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                                "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                                "sSearch": "Buscar:",
+                                "oPaginate": {
+                                    "sFirst": "Primero",
+                                    "sLast": "Último",
+                                    "sNext": "Siguiente",
+                                    "sPrevious": "Anterior"
+                                },
+                                "sProcessing": "Procesando...",
+                            },
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": true,
+                            "bInfo": true,
+                            "bAutoWidth": false
+                        });
+            });
+    </script>
+</body>
+</html>

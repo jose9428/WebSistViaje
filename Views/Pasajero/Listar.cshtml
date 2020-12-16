@@ -1,0 +1,250 @@
+﻿@model IEnumerable<SisWebViaje.Models.Pasajeros>
+
+@{
+    ViewBag.Title = "Listar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nroViaje = ViewBag.NroViaje;
+    string FecViaje = ViewBag.FechaViaje;
+    decimal pagoViaje = ViewBag.PagoViaje;
+
+    DateTime FechaActual = DateTime.Now.Date;
+    DateTime FechaViaje = Convert.ToDateTime(FecViaje).Date;
+}
+<br />
+@{
+    if (FechaViaje > FechaActual)
+    {
+      <a href="javascript:AbrirModal()" class="btn btn-success" id="AddPas">Adicionar Pasajero</a>
+    }
+}
+
+
+<div id="resultado">
+
+</div>
+
+<div class="modal fade" id="ModalAgregar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #04429C;color:#fff">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Nuevo Pasajero</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frm">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Pasajero</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="NOM_PAS" name="NOM_PAS">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Asiento</label>
+                        <div class="col-sm-10">
+                            <select id="NRO_ASI" name="NRO_ASI" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="staticEmail" class="col-sm-2 col-form-label">Tipo</label>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TIPO" id="radio1" value="N" checked onclick="CostoPasajero()">
+                                <label class="form-check-label" for="radio1">
+                                    Niño
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TIPO" id="radio2" value="E" onclick="CostoPasajero()">
+                                <label class="form-check-label" for="radio2">
+                                    Estudiante
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="TIPO" id="radio3" value="A" onclick="CostoPasajero()">
+                                <label class="form-check-label" for="radio3">
+                                    Adulto
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Pago</label>
+                        <div class="col-sm-10">
+                            <input type="text" readonly class="form-control" id="PAGO" name="PAGO">
+                        </div>
+                    </div>
+                    <input type="hidden" name="VIANRO" id="VIANRO" value="@nroViaje" />
+                </form>
+
+            </div>
+            <div class="modal-footer">
+
+                <button id="btnCancelar" type="button" class="btn btn-default" data-dismiss="modal" style="display:none;">Cerrar</button>
+                <button id="BtnGrabar" type="button" class="btn btn-primary" style="display:inline-block;">Guardar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        CargarListado();
+        LlenarAsientos();
+        CostoPasajero();
+    });
+
+    function AbrirModal() {
+        $("#ModalAgregar").modal('show');
+    }
+
+        function LlenarAsientos() {
+        var asiento = $("#NRO_ASI");
+        asiento.find('option').remove();
+        var cuenta = 0;
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AsientosDisp", "Pasajero")",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            data: {
+                id: '@nroViaje'
+            }, success: function (data) {
+                $.each(data, function (i, item) {
+                    asiento.append('<option value="' + item.NRO_ASI + '">' + item.NRO_ASI + '</option>');
+                    cuenta++;
+                });
+
+                if (cuenta > 0) {
+                   $("#AddPas").attr('disabled', false);
+                   // $("#AddPas").prop('onclick', null);
+                } else {
+                    $("#AddPas").attr('disabled', true);
+                    //$("#AddPas").prop('onclick', "AbrirModal()");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Error Imposible eliminar por que hay registros en las sub tablas.');
+            }
+        });
+    }
+
+
+    function ConfirmarDelete(boleto) {
+        bootbox.confirm({
+            message: "¿Esta Seguro que desea eliminar el pasajero con nro boleto " + boleto + " ?",
+            buttons: {
+                confirm: {
+                    label: 'Si',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("Eliminar" , "Pasajero")",
+                        content: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: {
+                            id: boleto
+                        },
+                        success: function (d) {
+                            if (d.resultado > 0) {
+                                Mensaje("Pasajero Retirado correctamente");
+                                CargarListado();
+                                LlenarAsientos();
+                            }
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            Mensaje('Error Imposible eliminar pasajero.');
+                        }
+                    });
+                }
+
+            }
+        });
+    }
+
+    $("#BtnGrabar").click(function () {
+        var datos = $("#frm").serialize();
+
+          $.ajax({
+            type: "POST",
+            url: "@Url.Action("Create", "Pasajero")",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+              data: datos
+              ,
+              success: function (data) {
+                  if (parseInt(data.res) > 0) {
+                      $("#ModalAgregar").modal('hide');
+                      Mensaje("Se registro correctamente el pasajero");
+                      CargarListado();
+                      LlenarAsientos();
+                      $("#NOM_PAS").val("");
+                  } else {
+                      Mensaje("No se ha podido registrar el pasajero");
+                  }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Error Imposible cargar datos.');
+            }
+        });
+
+    });
+
+    function CostoPasajero() {
+        var cadena =  @pagoViaje;
+       // cadena = cadena.replace(",", ".");
+
+        var costo = parseFloat(cadena);
+
+        var radio = $("input[name=TIPO]:checked").val();
+
+        switch (radio) {
+            case 'N': costo *= 0.5; break;
+            case 'E': costo *= 0.7; break;
+        }
+
+        $("#PAGO").val(Math.round(costo));
+    }
+
+
+    function CargarListado() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("ListadoPasajeros", "Pasajero")",
+            dataType: "html",
+            data: {
+                id: '@nroViaje'
+            } ,
+            beforeSend: function () {
+                $("#resultado").html("Cargando...");
+            },
+            success: function (data) {
+                $("#resultado").html(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Error Imposible cargar datos.');
+            }
+        });
+    }
+
+    function Mensaje(cadena) {
+        bootbox.alert({
+            message: cadena,
+            backdrop: true
+        });
+    }
+</script>

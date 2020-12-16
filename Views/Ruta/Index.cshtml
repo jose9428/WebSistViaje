@@ -1,0 +1,87 @@
+﻿@model IEnumerable<SisWebViaje.Models.Ruta>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+
+<p>
+    @Html.ActionLink("Nueva Ruta", "Create", null, new { @class = "btn btn-success", title = "Ir a registrar nueva ruta" })
+</p>
+
+<div id="resultado">
+
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        CargarListado();
+    });
+
+
+    function ConfirmarDelete(codRuta) {
+        bootbox.confirm({
+            message: "¿Esta Seguro que desea eliminar la ruta con codigo " + codRuta + " ?",
+            buttons: {
+                confirm: {
+                    label: 'Si',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("ConfEliminar" , "Ruta")",
+                        content: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: {
+                            id: codRuta
+                        },
+                        success: function (d) {
+                            if (d.resultado > 0) {
+                             //   Mensaje("Ruta eliminada correctamente");
+                                CargarListado();
+                                //window.location.reload();
+                            }
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            Mensaje('Error Imposible eliminar por que hay registros en las sub tablas.');
+                        }
+                    });
+                }
+
+            }
+        });
+    }
+
+    function CargarListado() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("Listado" , "Ruta")",
+            dataType: "html",
+            beforeSend: function () {
+                $("#resultado").html("Cargando...");
+            },
+            success: function (data) {
+                $("#resultado").html(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Mensaje('Error Imposible cargar datos.');
+            }
+        });
+    }
+
+    function Mensaje(cadena) {
+        bootbox.alert({
+            message: cadena,
+            backdrop: true
+        });
+    }
+</script>

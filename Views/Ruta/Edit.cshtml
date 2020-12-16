@@ -1,0 +1,85 @@
+﻿@model SisWebViaje.Models.Ruta
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var imagen = Model.RUTIMG;
+}
+
+<br />
+
+<div class="card">
+    <div class="card-header">
+        <h3>Modificar Ruta</h3>
+    </div>
+    <hr />
+    <div class="card-body">
+        @using (Html.BeginForm("Edit", "Ruta", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.RUTCOD)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.RUTNOM, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.RUTNOM, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.RUTNOM, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PAGOOCHO, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PAGOOCHO, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PAGOOCHO, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <img src="@Url.Content("~/Content/Imagen/"+Model.RUTIMG)" width="80" height="80" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.RUTIMG, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.RUTIMG, new { htmlAttributes = new { @class = "form-control", type = "file" } })
+                        @Html.ValidationMessageFor(model => model.RUTIMG, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Modificar" class="btn btn-primary" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Regresar al listado", "Index", null, new { @class = "btn btn-success" })
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        var pago = $("#PAGOOCHO").val();
+
+        try {
+            pago = pago.replace(",", ".");
+
+            $("#PAGOOCHO").val(parseInt(pago))
+        } catch (e) {
+            $("#PAGOOCHO").val(pago)
+        }
+    });
+</script>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
